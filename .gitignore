@@ -2,3 +2,7 @@ dist
 .cache
 node_modules
 .parcel-cache
+yarn.lock
+package-new.json
+user_data
+.DS_Store
