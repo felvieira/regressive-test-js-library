@@ -1,5 +1,5 @@
 {
-  "name": "puppeter-poc",
+  "name": "regressive-test-js-library",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "npm": ">=6.9.0"
   },
   "scripts": {
-    "dev": "npm install -g parcel-bundler && parcel index.js --target node && node node_modules/puppeteer/install.js",
+    "install": "npm install -g parcel-bundler && parcel index.js --target node && node node_modules/puppeteer/install.js",
     "builder": "npm install && npm install -g parcel-bundler && parcel build index.js --target node && node node_modules/puppeteer/install.js",
     "build": "parcel build index.js --target node",
     "approve": "node approve.js",
@@ -16,7 +16,7 @@
     "puppeteer-install": "node node_modules/puppeteer/install.js",
     "run": "URL=https://faq.pagbank.uol.com.br node ./dist/index.js"
   },
-  "author": "",
+  "author": "Felipe Vieira",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^6.3.0",
