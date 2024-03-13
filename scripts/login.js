@@ -1,100 +1,66 @@
 'use strict';
-
+const PuppeteerHelpers = require('../lib/helpers/puppeteerHelpers.js');
 const { userName, password, name } = require('../lib/config/credentials.json');
 const selectors = {
-	homeBtnUser: 'input#user',
-	homeBtnContinue: 'button#continue',
-	homeBtnPass: 'input#password',
-	homeBtnEnter: 'button#enter',
-	homeBtnLoginEntrar: 'a#entrar',
-	homeLoggedUser: 'strong.header__pswn-name',
+  homeBtnUser: '#user',
+  homeBtnPass: '#pass',
+  homeBtnLoginEntrar: '#signin',
+  homeLoggedUser: '.MuiAvatar-root',
 };
 
 module.exports = async (page, scenario, browser, viewPort) => {
-	if (scenario.login && viewPort === 'desktop') {
-		console.log('Breakpoint: ', viewPort);
-		try {
-			await page.goto(scenario.pageInitial, {
-				waitUntil: 'networkidle0',
-			});
+  const { homeBtnUser, homeBtnPass, homeBtnLoginEntrar, homeLoggedUser } =
+    selectors;
+  const { redirectToUrl, targetElementToWaitAfterRedirect } = scenario;
 
-			let pageType = {
-				isLoggedUser: false,
-				isHomeFaqEntrar: false,
-				isHomeLoginEmail: false,
-			};
+  try {
+    // Navega para a página inicial e aguarda pelo seletor do usuário logado.
+    await PuppeteerHelpers.navigateToPageAndWaitForSelector(
+      page,
+      scenario.pageInitial,
+      homeBtnLoginEntrar
+    );
 
-			try {
-				const isLogged = await page.waitForSelector(selectors.homeLoggedUser);
-				const isLoggedUser = await isLogged.evaluate(el =>
-					el.innerText.includes(name)
-				);
-				pageType.isLoggedUser = !isLoggedUser;
-			} catch (error) {
-				console.log(
-					'🚀 ~ isLogged Error- Não existe o seletor:',
-					selectors.homeLoggedUser
-				);
-			}
+    // Verifica se o usuário já está logado.
+    const isLoggedUser = await PuppeteerHelpers.checkIfSelectorExists(
+      page,
+      homeLoggedUser
+    );
+    if (isLoggedUser) {
+      console.log('Usuário já está logado');
+      return;
+    }
 
-			try {
-				const homeFaqEntrar = await page.waitForSelector(
-					selectors.homeBtnLoginEntrar
-				);
-				const isHomeFaqEntrar = await homeFaqEntrar.evaluate(el => Boolean(el));
-				pageType.isHomeFaqEntrar = isHomeFaqEntrar;
-			} catch (error) {
-				console.log(
-					'🚀 ~ isHomeFaqEntrar Error- Não existe o seletor:',
-					selectors.homeBtnLoginEntrar
-				);
-			}
+    console.log('Usuário não está logado, iniciando o login ...');
 
-			try {
-				const homeLoginEmail = await page.waitForSelector(
-					selectors.homeBtnUser
-				);
+    // Processo de Login: preenche os campos de usuário e senha e clica no botão de entrar.
+    await PuppeteerHelpers.waitForSelectorAndType(page, homeBtnUser, userName);
+    await PuppeteerHelpers.waitForSelectorAndType(page, homeBtnPass, password);
+    await PuppeteerHelpers.waitForSelectorAndClick(page, homeBtnLoginEntrar);
 
-				const isHomeLoginEmail = await homeLoginEmail.evaluate(el =>
-					Boolean(el)
-				);
-				pageType.isHomeLoginEmail = isHomeLoginEmail;
-			} catch (error) {
-				console.log(
-					'🚀 ~ isHomeLoginEmail Error- Não existe o seletor:',
-					selectors.homeBtnUser
-				);
-			}
+    // Aguarda até que o usuário esteja logado verificando a presença do seletor do usuário logado.
+    await page.waitForSelector(homeLoggedUser, { visible: true , timeout: 7000 });
 
-			if (
-				pageType.isLoggedUser ||
-				pageType.isHomeFaqEntrar ||
-				pageType.isHomeLoginEmail
-			) {
-				console.log('Usuário não está logado, iniciando o login ...');
-				if (pageType.isHomeFaqEntrar) {
-					await page.click(selectors.homeBtnLoginEntrar);
-					await page.waitFor(5000);
-				}
-				await page.waitFor(selectors.homeBtnUser);
-				await page.type(selectors.homeBtnUser, userName);
-				await page.click(selectors.homeBtnContinue);
-				await page.waitFor(5000);
-				await page.waitFor(selectors.homeBtnPass);
-				await page.type(selectors.homeBtnPass, password);
-				await page.click(selectors.homeBtnEnter);
-				await page.waitFor(10000);
-				console.log('Login feito com sucesso!');
-			} else {
-				console.log('Usuário já está logado');
-			}
-		} catch (error) {
-			await page.close();
-			await browser.close();
-			console.log(
-				`\n\nErro pageInitial na:${scenario.pageInitial} \n\n-> ${error}\n\n`
-			);
-			return;
-		}
-	}
+    console.log('Login realizado com sucesso!');
+
+    // Redireciona para a URL especificada após o login, se necessário.
+    if (redirectToUrl) {
+      console.log(`Redirecionando para ${redirectToUrl} após o login...`);
+      await PuppeteerHelpers.navigateToPageAndWaitForSelector(
+        page,
+        redirectToUrl,
+        targetElementToWaitAfterRedirect
+      );
+      console.log(`Página ${redirectToUrl} carregada com sucesso.`);
+    }
+
+    return;
+  } catch (error) {
+    console.error(
+      `Erro durante o processo de login na página ${scenario.pageInitial}:`,
+      error
+    );
+    await PuppeteerHelpers.closePageAndBrowser(page, browser);
+    return;
+  }
 };

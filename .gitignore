@@ -6,3 +6,7 @@ yarn.lock
 package-new.json
 user_data
 .DS_Store
+[0-9]*_[0-9]*_[0-9]*/
+.parcel-cache
+.cache
+node_modules
