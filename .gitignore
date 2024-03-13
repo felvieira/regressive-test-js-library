@@ -10,3 +10,4 @@ user_data
 .parcel-cache
 .cache
 node_modules
+reference/*
