@@ -3,6 +3,12 @@
 
 Este projeto utiliza Puppeteer para automação de navegadores, permitindo a captura de screenshots de diferentes páginas web em vários breakpoints (viewports) para fins de testes de regressão visual.
 
+![Demonstração](demo.gif)
+
+## Demonstração em Vídeo
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qoJjMfsdpwg"
+
 ## Configuração
 
 O projeto é configurado através de arquivos JSON, onde você pode definir os cenários de teste (`scenariosConfig`) e os viewports (`viewport.json`). Cada cenário define uma página para teste, junto com elementos específicos para aguardar antes da captura da screenshot, e qualquer ação necessária como login através de scripts adicionais.
