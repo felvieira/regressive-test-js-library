@@ -15,7 +15,7 @@ O arquivo `scenariosConfig` permite definir as URLs e os elementos-chave para os
 {
   "label": "Google Home",
   "pageInitial": "https://www.google.com",
-  "targetElementToWait": "input[name='q']",
+  "targetElementToWait": "form[action='/search']",
   "fullPage": true
 }
 ```
@@ -26,7 +26,7 @@ E para uma busca no Google:
 {
   "label": "Google Search",
   "pageInitial": "https://www.google.com",
-  "targetElementToWait": "input[name='q']",
+  "targetElementToWait": "form[action='/search']",
   "fullPage": true,
   "pageScript": "../scripts/searchGoogle.js"
 }
