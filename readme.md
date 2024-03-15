@@ -3,11 +3,13 @@
 
 Este projeto utiliza Puppeteer para automação de navegadores, permitindo a captura de screenshots de diferentes páginas web em vários breakpoints (viewports) para fins de testes de regressão visual.
 
+## Demo
 ![Demonstração](demo.gif)
 
-## Demonstração em Vídeo
+## Demo em Vídeo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/qoJjMfsdpwg"
+<iframe width="560" height="315" src="https://www.youtube.com/embed/qoJjMfsdpwg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 ## Configuração
 
