@@ -39,7 +39,10 @@ module.exports = async (page, scenario, browser, viewPort) => {
     await PuppeteerHelpers.waitForSelectorAndClick(page, homeBtnLoginEntrar);
 
     // Aguarda até que o usuário esteja logado verificando a presença do seletor do usuário logado.
-    await page.waitForSelector(homeLoggedUser, { visible: true , timeout: 7000 });
+    await page.waitForSelector(homeLoggedUser, {
+      visible: true,
+      timeout: 7000,
+    });
 
     console.log('Login realizado com sucesso!');
 

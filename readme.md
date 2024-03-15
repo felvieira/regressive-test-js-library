@@ -1,15 +1,14 @@
-
 # Projeto de Testes de Regressão Visual
 
 Este projeto utiliza Puppeteer para automação de navegadores, permitindo a captura de screenshots de diferentes páginas web em vários breakpoints (viewports) para fins de testes de regressão visual.
 
 ## Demo
+
 ![Demonstração](demo-otm.gif)
 
 ## Demo em Vídeo
 
 https://youtu.be/qoJjMfsdpwg
-
 
 ## Configuração
 

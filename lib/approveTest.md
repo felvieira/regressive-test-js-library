@@ -5,15 +5,19 @@ Esta classe é responsável por aprovar os testes realizados, copiando as imagen
 ## Métodos
 
 ### `deleteResizedReferenceFiles()`
+
 Exclui arquivos redimensionados da pasta de referência.
 
 ### `copyTestImagesToReference(testFolderName)`
+
 Copia imagens de teste para a pasta de referência, excluindo as imagens redimensionadas.
 
 ### `getFolderPath(folderName)`
+
 Retorna o caminho completo de uma pasta dada o nome.
 
 ### `approveTests()`
+
 Inicia o processo de aprovação dos testes. Se aprovado, as imagens de teste são copiadas para a pasta de referência.
 
 ## Uso

@@ -13,13 +13,21 @@ module.exports = async (page, scenario, browser, viewPort) => {
     console.log('Página inicial do Google carregada.');
 
     // Digita o termo de busca no campo de busca e pressiona Enter.
-    await PuppeteerHelpers.waitForSelectorAndType(page, scenario.targetElementToWait, scenario.searchQuery);
+    await PuppeteerHelpers.waitForSelectorAndType(
+      page,
+      scenario.targetElementToWait,
+      scenario.searchQuery
+    );
     await page.keyboard.press('Enter');
 
     // Aguarda até que os resultados da busca sejam carregados.
-    await page.waitForSelector(scenario.targetElementToWaitAfterRedirect, { visible: true });
+    await page.waitForSelector(scenario.targetElementToWaitAfterRedirect, {
+      visible: true,
+    });
 
-    console.log(`Resultados da busca por "${scenario.searchQuery}" carregados com sucesso.`);
+    console.log(
+      `Resultados da busca por "${scenario.searchQuery}" carregados com sucesso.`
+    );
 
     return;
   } catch (error) {
