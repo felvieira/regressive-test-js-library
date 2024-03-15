@@ -1,186 +1,129 @@
-'use strict';
+class ReportUI {
+  constructor() {
+    this.initModalWithImageSliderCompare();
+    this.filteringByBreakpointAndStatus();
+    this.searchScenarios();
+  }
 
-document.addEventListener('DOMContentLoaded', function() {
-	function $sel(el) {
-		return document.querySelector(el);
-	}
-	function $all(el) {
-		return document.querySelectorAll(el);
-	}
+  select(selector) {
+    return document.querySelector(selector);
+  }
 
-	function count(el) {
-		return el.length;
-	}
+  selectAll(selector) {
+    return document.querySelectorAll(selector);
+  }
 
-	function mountCount(el, button) {
-		const label = button.textContent;
-		button.innerHTML = `${label} <small>${count(el)}</small>`;
-	}
+  count(elements) {
+    return elements.length;
+  }
 
-	function searchScenarios() {
-		const divsAll = $all('.card');
-		const labels = $all('.card > .card-label');
-		const inputSearch = $sel('.header-container-search-input > input');
+  mountCount(elements, buttonSelector) {
+    const button = this.select(buttonSelector);
+    if (button) {
+      const label = button.textContent.split(' ')[0];
+      button.innerHTML = `${label} <small>${this.count(elements)}</small>`;
+    }
+  }
 
-		function initSearchInput(
-			inputSelector,
-			divRoot,
-			labelsTexts,
-			classHide,
-			inputLength
-		) {
-			inputSelector.addEventListener('input', event => {
-				if (event.target.value.length >= inputLength) {
-					labelsTexts.forEach(label => {
-						const textInput = event.target.value;
-						const labelText = label.innerText
-							.replace('Página: ', '')
-							.split('|')[0]
-							.trim();
-						const textInputMatchTextLabel = labelText
-							.toLowerCase()
-							.includes(textInput.toLowerCase());
-						const matchDivIsHide = $sel(
-							`[data-label="${labelText}"]`
-						).classList.contains(classHide);
-						if (textInputMatchTextLabel) {
-							if (matchDivIsHide) {
-								$sel(`[data-label="${labelText}"]`).classList.toggle(classHide);
-							}
-						} else {
-							if (!matchDivIsHide) {
-								$sel(`[data-label="${labelText}"]`).classList.toggle(classHide);
-							}
-						}
-					});
-				} else {
-					divRoot.forEach(div => {
-						div.classList.remove(classHide);
-					});
-				}
-			});
-		}
-		initSearchInput(inputSearch, divsAll, labels, 'hide', 3);
-	}
+  toggleVisibility(elements, shouldShow) {
+    elements.forEach((element) => {
+      element.classList.toggle('hide', !shouldShow);
+    });
+  }
 
-	function initModalWithImageSliderCompare() {
-		const modals = $all('.modal');
-		const btnTest = $all('.card-content-column.test');
+  searchScenarios() {
+    const input = this.select('.header-container-search-input > input');
+    input.addEventListener('input', (event) => {
+      const searchValue = event.target.value.toLowerCase();
+      const cards = this.selectAll('.card');
+      cards.forEach((card) => {
+        const label = card
+          .querySelector('.card-label')
+          .textContent.toLowerCase();
+        card.classList.toggle('hide', !label.includes(searchValue));
+      });
+    });
+  }
 
-		modals.forEach(element => {
-			let view = new ImageCompare(element, {
-				fluidMode: true
-			}).mount();
-		});
+  initModalWithImageSliderCompare() {
+    const modals = this.selectAll('.modal');
+    const btnTest = this.selectAll('.card-content-column.test');
 
-		btnTest.forEach((item, i) => {
-			item.addEventListener('click', () =>
-				$sel(`#modal-${i}`).classList.remove('hide')
-			);
-		});
+    modals.forEach((modal) => {
+      new ImageCompare(modal, { fluidMode: true }).mount();
+    });
 
-		$all('div[id^=\'modal\'] > .close').forEach((item, i) => {
-			item.addEventListener('click', () =>
-				$sel(`#modal-${i}`).classList.add('hide')
-			);
-		});
-	}
+    btnTest.forEach((btn, index) => {
+      btn.addEventListener('click', () =>
+        this.select(`#modal-${index}`).classList.remove('hide')
+      );
+    });
 
-	function filteringByBreakpointAndStatus() {
-		const phone = $all('[data-scenario=\'phone\']');
-		const tablet = $all('[data-scenario=\'tablet\']');
-		const desktop = $all('[data-scenario=\'desktop\']');
-		const reproved = [...phone, ...tablet, ...desktop].filter(
-			tgt => parseInt(tgt.dataset.compatibility) <= 90
-		);
-		const passed = [...phone, ...tablet, ...desktop].filter(
-			tgt => parseInt(tgt.dataset.compatibility) >= 90
-		);
-		const differentSize = [...phone, ...tablet, ...desktop].filter(
-			tgt => tgt.dataset.compatibility.length <= 0
-		);
-		const btnPhone = $sel('.phone');
-		const btnTablet = $sel('.tablet');
-		const btnDesktop = $sel('.desktop');
-		const btnAll = $sel('.all');
-		const btnReproved = $sel('.reproved');
-		const btnPassed = $sel('.passed');
-		const btnWrongSizes = $sel('.sizes');
-		const buttons = [btnPhone, btnTablet, btnDesktop];
+    this.selectAll('div[id^="modal"] .close').forEach((btn, index) => {
+      btn.addEventListener('click', () =>
+        this.select(`#modal-${index}`).classList.add('hide')
+      );
+    });
+  }
 
-		const toggleVisibilityByReport = (btn, itemsToHide, itemsToShow) => {
-			btn.addEventListener('click', () => {
-				itemsToHide.forEach(scenario => {
-					scenario.classList.add('hide');
-				});
+  filteringByBreakpointAndStatus() {
+    const scenarios = [
+      'phone',
+      'tablet',
+      'desktop',
+      'passed',
+      'reproved',
+      'sizes',
+      'all',
+    ];
+    const cards = this.selectAll('.card');
 
-				itemsToShow.forEach(scenario => {
-					scenario.classList.remove('hide');
-				});
-			});
-		};
+    scenarios.forEach((scenario) => {
+      const btn = this.select(`.${scenario}`);
+      if (!btn) return;
 
-		function filterScenarios(button, scn, tgt) {
-			if (button.classList.contains(scn)) {
-				tgt.forEach(scenario => {
-					if (scenario.dataset.scenario === scn) {
-						if (scenario.classList.contains('hide')) {
-							scenario.classList.toggle('hide');
-						}
-					} else {
-						if (!scenario.classList.contains('hide')) {
-							scenario.classList.toggle('hide');
-						}
-					}
-				});
-			}
-		}
+      btn.addEventListener('click', () => {
+        const filterFunc = this.filterFunctions[scenario];
+        cards.forEach((card) => {
+          const shouldBeVisible = filterFunc ? filterFunc(card) : true;
+          card.classList.toggle('hide', !shouldBeVisible);
+        });
+      });
+    });
 
-		function mountMenuWithCountAndFilters() {
-			mountCount(phone, btnPhone);
-			mountCount(tablet, btnTablet);
-			mountCount(desktop, btnDesktop);
-			mountCount(reproved, btnReproved);
-			mountCount(passed, btnPassed);
-			mountCount(differentSize, btnWrongSizes);
-			mountCount([...phone, ...tablet, ...desktop], btnAll);
+    this.updateButtonCounts();
+  }
 
-			toggleVisibilityByReport(btnAll, [], [...phone, ...tablet, ...desktop]);
+  get filterFunctions() {
+    return {
+      phone: (card) => card.dataset.scenario === 'phone',
+      tablet: (card) => card.dataset.scenario === 'tablet',
+      desktop: (card) => card.dataset.scenario === 'desktop',
+      passed: (card) => parseFloat(card.dataset.compatibility) >= 90,
+      reproved: (card) =>
+        parseFloat(card.dataset.compatibility) < 90 &&
+        card.dataset.compatibility !== '',
+      sizes: (card) => card.dataset.compatibility === '',
+      all: () => true,
+    };
+  }
 
-			toggleVisibilityByReport(
-				btnReproved,
-				[...passed, ...differentSize],
-				reproved
-			);
+  updateButtonCounts() {
+    const cards = this.selectAll('.card');
+    [
+      'phone',
+      'tablet',
+      'desktop',
+      'passed',
+      'reproved',
+      'sizes',
+      'all',
+    ].forEach((scenario) => {
+      const filterFunc = this.filterFunctions[scenario];
+      const count = Array.from(cards).filter(filterFunc).length;
+      this.mountCount(Array.from(cards).filter(filterFunc), `.${scenario}`);
+    });
+  }
+}
 
-			toggleVisibilityByReport(
-				btnPassed,
-				[...reproved, ...differentSize],
-				passed
-			);
-
-			toggleVisibilityByReport(
-				btnWrongSizes,
-				[...passed, ...reproved, ...differentSize],
-				differentSize
-			);
-
-			buttons.forEach(button => {
-				button.addEventListener('click', () => {
-					['phone', 'tablet', 'desktop'].forEach(breakpoint => {
-						filterScenarios(button, breakpoint, [
-							...phone,
-							...tablet,
-							...desktop
-						]);
-					});
-				});
-			});
-		}
-		mountMenuWithCountAndFilters();
-	}
-
-	initModalWithImageSliderCompare();
-	filteringByBreakpointAndStatus();
-	searchScenarios();
-});
+document.addEventListener('DOMContentLoaded', () => new ReportUI());
